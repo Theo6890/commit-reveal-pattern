@@ -17,7 +17,8 @@ contract RockPaperScisor {
 
     enum Stage {
         COMMIT,
-        REVEAL
+        REVEAL,
+        WITHDRAW_REWARDS
     }
 
     struct RevealData {
