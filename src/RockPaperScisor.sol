@@ -2,8 +2,11 @@
 pragma solidity ^0.8.13;
 
 import {EnumerableSet} from "openzeppelin-contracts/utils/structs/EnumerableSet.sol";
+import {Address} from "openzeppelin-contracts/utils/Address.sol";
+
 // solhint-disable-next-line no-empty-blocks
 contract RockPaperScisor {
+    using Address for address payable;
     using EnumerableSet for EnumerableSet.AddressSet;
 
     enum Action {
