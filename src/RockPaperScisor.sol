@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
+import {EnumerableSet} from "openzeppelin-contracts/utils/structs/EnumerableSet.sol";
 // solhint-disable-next-line no-empty-blocks
 contract RockPaperScisor {
+    using EnumerableSet for EnumerableSet.AddressSet;
+
     enum Action {
         ROCK,
         PAPER,
@@ -48,7 +51,7 @@ contract RockPaperScisor {
 
     mapping(address => bytes32) private _commits;
     mapping(address => uint256) private _deposits;
-    address[] public players; // to a EnumarableSet to use .contains()
+    EnumerableSet.AddressSet private _players;
 
     function commitOf(address player) public view returns (bytes32) {
         return _commits[player];
@@ -70,7 +73,7 @@ contract RockPaperScisor {
         _commits[player] = keccak256(abi.encodePacked(data, salt));
         _deposits[player] += amount;
         depositedETH += amount;
-        players.push(player);
+        _players.add(player);
 
         // emit Deposited(payee, amount);
 
@@ -174,7 +177,7 @@ contract RockPaperScisor {
     ///@dev very sensitive function, must only be used in this contract
     function __resetDepositOnWinsOnly() private {
         for (uint i; i < playersCounter; ++i) {
-            _deposits[players[i]] = 0;
+            _deposits[_players.at(i)] = 0;
         }
     }
 }
