@@ -114,6 +114,20 @@ contract RockPaperScisor {
         _revealWinner(resFirstPlayer, player1Data.player, player2Data.player);
 
         // add PullPayment logic
+        _computeRewards();
+
+        stage = Stage.WITHDRAW_REWARDS;
+    }
+
+    function _computeRewards() internal {
+        // in case of equality each player takes their deposit back
+        // (handle by PullPayment)
+
+        // otherwise if there is a winner they take it all (verify winner is set)
+        if ((winner != address(0)) && (winner != EQUALITY_ADDR)) {
+            __resetDepositOnWinsOnly();
+            _deposits[winner] = depositedETH;
+        }
     }
 
     function _revealWinner(
@@ -155,5 +169,12 @@ contract RockPaperScisor {
             return BattleResult.WIN;
         // if it is not, an equality equality or a win, it is a loss
         else return BattleResult.LOSS;
+    }
+
+    ///@dev very sensitive function, must only be used in this contract
+    function __resetDepositOnWinsOnly() private {
+        for (uint i; i < playersCounter; ++i) {
+            _deposits[players[i]] = 0;
+        }
     }
 }
