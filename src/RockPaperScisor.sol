@@ -55,6 +55,7 @@ contract RockPaperScisor {
     mapping(address => uint256) private _deposits;
     EnumerableSet.AddressSet private _players;
 
+    // TEST: this modifier
     modifier requireStage(Stage _stage) {
         require(_stage == stage, "Wrong stage");
         _;
@@ -75,6 +76,7 @@ contract RockPaperScisor {
         depositedETH += amount;
         _players.add(player);
 
+        // TODO: add event
         // emit Deposited(payee, amount);
 
         if (_players.length() == 2) _netxStage();
@@ -158,6 +160,7 @@ contract RockPaperScisor {
         // (handle by PullPayment)
 
         // otherwise if there is a winner they take it all (verify winner is set)
+        // TEST: winner can never be == address(0) in any situation to remove condition
         if ((winner != address(0)) && (winner != EQUALITY_ADDR)) {
             __resetDepositsOnWinsOnly();
             _deposits[winner] = depositedETH;
@@ -228,6 +231,7 @@ contract RockPaperScisor {
     }
 
     function __resetDepositsOnWinsOnly() private {
+        // TODO: will assigning a local variable save gas, instead using `_players.length()`?
         for (uint i; i < 2; ++i) {
             _deposits[_players.at(i)] = 0;
         }

@@ -96,6 +96,7 @@ contract RockPaperScisorTest is Test {
         );
     }
 
+    // TODO: update to use on logic until requires() functions from `revealWinnerTwoPlayers`
     function test_revealWinnerTwoPlayers_VerifyDataAuthenticity() public {
         __aliceCommitsChoiceWithDeposit();
         __bobCommitsChoiceWithDeposit();
@@ -104,6 +105,8 @@ contract RockPaperScisorTest is Test {
 
         // verify require not triggered
     }
+
+    // TODO: add failling tests of `revealWinnerTwoPlayers` to triger both saltedHash `require()` (many different wrong params for max coverage)
 
     function test_revealWinnerTwoPlayers_VerifyBobWinsAndTriggeredNextStage()
         public
@@ -125,6 +128,11 @@ contract RockPaperScisorTest is Test {
             uint256(RockPaperScisor.Stage.WITHDRAW_REWARDS)
         );
     }
+
+    // TODO: add fixtures to cover 2 left results (LOSS, EQUALITY)
+    // TODO: add tests to verify `_computeRewards` in order to ensure _deposits are not ZEROed on EQUALITY and each player can withdraw their deposits
+    // TODO: add tests of  `revealWinnerTwoPlayers` to ensure _computeRewards().if(winner != address(0)) is always true
+    // TODO: test gas consumption on `__resetDepositOnWinsOnly`
 
     function test_withdrawRewards_VerifyBobCanWithdrawReards() public {
         __aliceCommitsChoiceWithDeposit();
@@ -165,4 +173,6 @@ contract RockPaperScisorTest is Test {
         // registered players
         assertTrue(instance.playersLength() == 0);
     }
+
+    // TODO: add tests of values reinitialisation when there is an EQUALITY
 }
