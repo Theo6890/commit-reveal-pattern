@@ -108,6 +108,10 @@ contract RockPaperScisor {
         return _deposits[payee];
     }
 
+    function playersLength() public view returns (uint256) {
+        return _players.length();
+    }
+
     function generateSaltedHashFrom(
         RevealData memory data
     ) public pure returns (bytes32 salted) {
