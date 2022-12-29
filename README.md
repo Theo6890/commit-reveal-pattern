@@ -1,4 +1,4 @@
-# <h1 align="center"> Foundryx Hardhat Template </h1>
+# <h1 align="center"> Commit Reveal - Pattern Implementation </h1>
 
 This repo implements the commit-reveal pattern. This pattern prevents frontrunning attack on betting type contract or similar. No one can see a clear input and submit the same transaction with the same parameters with a higher gas amount & price to to steel the original user's answer.
 
