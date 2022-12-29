@@ -51,4 +51,23 @@ contract RockPaperScisor {
                 )
             );
     }
+
+    function revealWinnerTwoPlayers(
+        RevealData memory player1Data,
+        RevealData memory player2Data
+    ) public {
+        bytes32 saltedHash1 = generateSaltedHashFrom(player1Data);
+        bytes32 saltedHash2 = generateSaltedHashFrom(player2Data);
+
+        require(
+            saltedHash1 == commitOf[player1Data.player],
+            "P1: data mismatch"
+        );
+        require(
+            saltedHash2 == commitOf[player2Data.player],
+            "P2: data mismatch"
+        );
+
+        // add PullPayment logic
+    }
 }
