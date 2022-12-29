@@ -37,3 +37,5 @@ contract RockPaperScisor {
 
         if (playersCounter == 2) stage = Stage.REVEAL;
     }
+
+}
