@@ -215,7 +215,7 @@ contract RockPaperScisor {
         delete stage;
         delete depositedETH;
 
-        for (uint i; i < _players.length(); ++i) {
+        for (uint i; i < 2; ++i) {
             delete _commits[_players.at(i)];
         }
 
@@ -228,7 +228,7 @@ contract RockPaperScisor {
     }
 
     function __resetDepositsOnWinsOnly() private {
-        for (uint i; i < _players.length(); ++i) {
+        for (uint i; i < 2; ++i) {
             _deposits[_players.at(i)] = 0;
         }
     }
