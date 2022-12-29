@@ -8,8 +8,8 @@ import {RockPaperScisor} from "../src/RockPaperScisor.sol";
 contract RockPaperScisorTest is Test {
     RockPaperScisor public instance;
 
-    address alice = 0x690B9A9E9aa1C9dB991C7721a92d351Db4FaC990;
-    address bob = 0xDEe2C8F3345104f6DD081657D180A9058Be7Ab05;
+    address public constant ALICE = 0x690B9A9E9aa1C9dB991C7721a92d351Db4FaC990;
+    address public constant BOB = 0xDEe2C8F3345104f6DD081657D180A9058Be7Ab05;
 
     RockPaperScisor.Action public aliceAction = RockPaperScisor.Action.ROCK;
     bytes32 public aliceCommit;
@@ -26,36 +26,36 @@ contract RockPaperScisorTest is Test {
     function setUp() public {
         instance = new RockPaperScisor();
 
-        vm.deal(alice, 7 ether);
-        vm.deal(bob, 7 ether);
+        vm.deal(ALICE, 7 ether);
+        vm.deal(BOB, 7 ether);
 
-        aliceCommit = keccak256(abi.encodePacked(alice, aliceAction));
+        aliceCommit = keccak256(abi.encodePacked(ALICE, aliceAction));
         aliceSaltedCommit = keccak256(
             abi.encodePacked(aliceCommit, ALICE_SALT)
         );
         revealAliceData = RockPaperScisor.RevealData(
-            alice,
+            ALICE,
             aliceAction,
             ALICE_SALT
         );
 
-        bobCommit = keccak256(abi.encodePacked(bob, bobAction));
+        bobCommit = keccak256(abi.encodePacked(BOB, bobAction));
         bobSaltedCommit = keccak256(abi.encodePacked(bobCommit, BOB_SALT));
-        revealBobData = RockPaperScisor.RevealData(bob, bobAction, BOB_SALT);
+        revealBobData = RockPaperScisor.RevealData(BOB, bobAction, BOB_SALT);
     }
 
     function __aliceCommitsChoiceWithDeposit() private {
-        vm.prank(alice);
+        vm.prank(ALICE);
         instance.commitOnlyTwoPlayers{value: 5 ether}(aliceCommit, ALICE_SALT);
 
-        assert(instance.commitOf(alice) == aliceSaltedCommit);
+        assert(instance.commitOf(ALICE) == aliceSaltedCommit);
     }
 
     function __bobCommitsChoiceWithDeposit() private {
-        vm.prank(bob);
+        vm.prank(BOB);
         instance.commitOnlyTwoPlayers{value: 5 ether}(bobCommit, BOB_SALT);
 
-        assert(instance.commitOf(bob) == bobSaltedCommit);
+        assert(instance.commitOf(BOB) == bobSaltedCommit);
     }
 
     /*//////////////////////////////////////////////////////////////
