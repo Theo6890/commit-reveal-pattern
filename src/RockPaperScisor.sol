@@ -31,7 +31,6 @@ contract RockPaperScisor {
     }
 
     Stage public stage = Stage.COMMIT;
-    uint8 public playersCounter;
 
     uint256 public depositedETH;
     address public winner;
@@ -61,7 +60,6 @@ contract RockPaperScisor {
         require(_commits[player] == bytes32(""), "Already commited");
         require(stage == Stage.COMMIT, "Two players already competing");
 
-        ++playersCounter;
         _commits[player] = keccak256(abi.encodePacked(data, salt));
         _deposits[player] += amount;
         depositedETH += amount;
@@ -69,7 +67,7 @@ contract RockPaperScisor {
 
         // emit Deposited(payee, amount);
 
-        if (playersCounter == 2) stage = Stage.REVEAL;
+        if (_players.length() == 2) stage = Stage.REVEAL;
     }
 
     function revealWinnerTwoPlayers(
@@ -176,7 +174,7 @@ contract RockPaperScisor {
 
     ///@dev very sensitive function, must only be used in this contract
     function __resetDepositOnWinsOnly() private {
-        for (uint i; i < playersCounter; ++i) {
+        for (uint i; i < _players.length(); ++i) {
             _deposits[_players.at(i)] = 0;
         }
     }
