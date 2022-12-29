@@ -65,11 +65,31 @@ contract RockPaperScisorTest is Test {
     /*//////////////////////////////////////////////////////////////
                                  BASIC ATTRIBUTES
     //////////////////////////////////////////////////////////////*/
-    function test_commitOnlyTwoPlayers_CheckAliceAndBobCommits() public {
+    function test_commitOnlyTwoPlayers_CheckSavedValuesOfAliceAndBobCommits()
+        public
+    {
         __aliceCommitsChoiceWithDeposit();
+        assertTrue(instance.commitOf(ALICE) == aliceSaltedCommit);
+        assertEq(instance.depositsOf(ALICE), 5 ether);
+
+        // stage not changed as only one player atm
+        assertEq(
+            uint256(instance.stage()),
+            uint256(RockPaperScisor.Stage.COMMIT)
+        );
+
         __bobCommitsChoiceWithDeposit();
+        assertTrue(instance.commitOf(BOB) == bobSaltedCommit);
+        assertEq(instance.depositsOf(BOB), 5 ether);
 
         assertEq(instance.depositedETH(), 10 ether);
+
+        assertEq(instance.playersLength(), 2);
+
+        assertEq(
+            uint256(instance.stage()),
+            uint256(RockPaperScisor.Stage.REVEAL)
+        );
     }
 
     function test_revealWinnerTwoPlayers_VerifyDataAuthenticity() public {
