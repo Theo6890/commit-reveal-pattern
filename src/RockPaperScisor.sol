@@ -159,7 +159,7 @@ contract RockPaperScisor {
 
         // otherwise if there is a winner they take it all (verify winner is set)
         if ((winner != address(0)) && (winner != EQUALITY_ADDR)) {
-            __resetDepositOnWinsOnly();
+            __resetDepositsOnWinsOnly();
             _deposits[winner] = depositedETH;
         }
     }
@@ -227,7 +227,7 @@ contract RockPaperScisor {
         delete _players;
     }
 
-    function __resetDepositOnWinsOnly() private {
+    function __resetDepositsOnWinsOnly() private {
         for (uint i; i < _players.length(); ++i) {
             _deposits[_players.at(i)] = 0;
         }
