@@ -125,4 +125,17 @@ contract RockPaperScisorTest is Test {
             uint256(RockPaperScisor.Stage.WITHDRAW_REWARDS)
         );
     }
+
+    function test_withdrawRewards_VerifyBobCanWithdrawReards() public {
+        __aliceCommitsChoiceWithDeposit();
+        __bobCommitsChoiceWithDeposit();
+        instance.revealWinnerTwoPlayers(revealAliceData, revealBobData);
+
+        uint256 oldBalance = BOB.balance;
+
+        vm.prank(BOB); // winner
+        instance.withdrawRewards();
+
+        assertEq(BOB.balance, oldBalance + 10 ether);
+    }
 }
