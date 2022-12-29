@@ -105,5 +105,16 @@ contract RockPaperScisorTest is Test {
         __bobCommitsChoiceWithDeposit();
 
         instance.revealWinnerTwoPlayers(revealAliceData, revealBobData);
+
+        // verify require not triggered
+    }
+
+    function test_revealWinnerTwoPlayers_VerifyBobWins() public {
+        __aliceCommitsChoiceWithDeposit();
+        __bobCommitsChoiceWithDeposit();
+
+        instance.revealWinnerTwoPlayers(revealAliceData, revealBobData);
+
+        assertEq(instance.winner(), BOB);
     }
 }
