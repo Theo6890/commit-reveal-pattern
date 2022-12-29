@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-npx solhint src/*.sol test/*.sol --fix
+npx solhint src/*.sol 
+# "func-name-mixedcase" is off in test files as Foundry Best Pract. are different
+npx solhint test/*.sol --fix -c .solhint.test.json
 npx prettier --check .
