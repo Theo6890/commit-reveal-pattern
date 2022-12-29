@@ -42,7 +42,9 @@ contract RockPaperScisorTest is Test {
         bobCommit = keccak256(abi.encodePacked(BOB, bobAction));
         bobSaltedCommit = keccak256(abi.encodePacked(bobCommit, BOB_SALT));
         revealBobData = RockPaperScisor.RevealData(BOB, bobAction, BOB_SALT);
+    }
 
+    function test_Log_EQUALITY_ADDR() public {
         emit log_named_address("EQUALITY ADDRESS", instance.EQUALITY_ADDR());
     }
 
