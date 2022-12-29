@@ -45,15 +45,19 @@ contract RockPaperScisor {
      */
     address public constant EQUALITY_ADDR = address(bytes20("EQLT"));
 
-    mapping(address => bytes32) public commitOf;
+    mapping(address => bytes32) private _commits;
+
+    function commitOf(address player) public view returns (bytes32) {
+        return _commits[player];
+    }
 
     function commitOnlyTwoPlayers(bytes32 data, uint256 salt) public payable {
-        require(commitOf[msg.sender] == bytes32(""), "Already commited");
+        require(_commits[msg.sender] == bytes32(""), "Already commited");
         require(stage == Stage.COMMIT, "Two players already competing");
         require(msg.value == 5 ether, "Deposit 5 ether");
 
         ++playersCounter;
-        commitOf[msg.sender] = keccak256(abi.encodePacked(data, salt));
+        _commits[msg.sender] = keccak256(abi.encodePacked(data, salt));
         depositedETH += msg.value;
 
         if (playersCounter == 2) stage = Stage.REVEAL;
@@ -79,11 +83,11 @@ contract RockPaperScisor {
         bytes32 saltedHash2 = generateSaltedHashFrom(player2Data);
 
         require(
-            saltedHash1 == commitOf[player1Data.player],
+            saltedHash1 == _commits[player1Data.player],
             "P1: data mismatch"
         );
         require(
-            saltedHash2 == commitOf[player2Data.player],
+            saltedHash2 == _commits[player2Data.player],
             "P2: data mismatch"
         );
 
