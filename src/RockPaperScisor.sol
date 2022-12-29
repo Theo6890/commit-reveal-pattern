@@ -9,6 +9,12 @@ contract RockPaperScisor {
         SCISOR
     }
 
+    enum BattleResult {
+        WIN,
+        LOSS,
+        EQUALITY
+    }
+
     enum Stage {
         COMMIT,
         REVEAL
@@ -68,6 +74,38 @@ contract RockPaperScisor {
             "P2: data mismatch"
         );
 
+        // verify who is the winner
+        BattleResult resFirstPlayer = _isFirstActionWinning(
+            player1Data.action,
+            player2Data.action
+        );
+
         // add PullPayment logic
+    }
+
+    function _isFirstActionWinning(Action a1, Action a2)
+        internal
+        pure
+        returns (BattleResult)
+    {
+        // Equality
+        if (a1 == a2) return BattleResult.EQUALITY;
+        // paper
+        // - wins over rock
+        // - losses over scisor
+        else if ((a1 == Action.PAPER) && (a2 == Action.ROCK))
+            return BattleResult.WIN;
+        // rock
+        // - wins over scisor
+        // - losses over paper
+        else if ((a1 == Action.ROCK) && (a2 == Action.SCISOR))
+            return BattleResult.WIN;
+        // scisor
+        // - wins over paper
+        // - losses rock
+        else if ((a1 == Action.SCISOR) && (a2 == Action.PAPER))
+            return BattleResult.WIN;
+        // if it is not, an equality equality or a win, it is a loss
+        else BattleResult.LOSS;
     }
 }
