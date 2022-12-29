@@ -107,6 +107,22 @@ contract RockPaperScisor {
         _netxStage();
     }
 
+    function withdrawRewards() public requireStage(Stage.WITHDRAW_REWARDS) {
+        address payable payee = payable(msg.sender);
+        uint256 payment = _deposits[payee];
+
+        require(payment > 0, "Game lost!");
+
+        _deposits[payee] = 0;
+
+        payee.sendValue(payment);
+
+        //TODO: add event
+        //emit Withdrawn(payee, payment);
+
+        __resetAllAfterAllWithdrawals();
+    }
+
     function commitOf(address player) public view returns (bytes32) {
         return _commits[player];
     }
@@ -187,7 +203,22 @@ contract RockPaperScisor {
         else return BattleResult.LOSS;
     }
 
-    ///@dev very sensitive function, must only be used in this contract
+    ///@dev very sensitive functions, must only be used in this contract
+
+    function __resetAllAfterAllWithdrawals() private {
+        delete stage;
+        delete depositedETH;
+        delete winner;
+
+        for (uint i; i < _players.length(); ++i) {
+            delete _commits[_players.at(i)];
+        }
+
+        ///@dev deposits have already been in `_computeRewards` for loser(s) and in `withdrawRewards` for winner
+
+        delete _players;
+    }
+
     function __resetDepositOnWinsOnly() private {
         for (uint i; i < _players.length(); ++i) {
             _deposits[_players.at(i)] = 0;
