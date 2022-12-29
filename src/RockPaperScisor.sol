@@ -44,11 +44,9 @@ contract RockPaperScisor {
         if (playersCounter == 2) stage = Stage.REVEAL;
     }
 
-    function generateSaltedHashFrom(RevealData memory data)
-        public
-        pure
-        returns (bytes32 salted)
-    {
+    function generateSaltedHashFrom(
+        RevealData memory data
+    ) public pure returns (bytes32 salted) {
         return
             keccak256(
                 abi.encodePacked(
