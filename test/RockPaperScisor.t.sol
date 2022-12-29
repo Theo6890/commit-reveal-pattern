@@ -105,12 +105,20 @@ contract RockPaperScisorTest is Test {
         // verify require not triggered
     }
 
-    function test_revealWinnerTwoPlayers_VerifyBobWins() public {
+    function test_revealWinnerTwoPlayers_VerifyBobWinsAndTriggeredNextStage()
+        public
+    {
         __aliceCommitsChoiceWithDeposit();
         __bobCommitsChoiceWithDeposit();
 
         instance.revealWinnerTwoPlayers(revealAliceData, revealBobData);
 
         assertEq(instance.winner(), BOB);
+
+        // once we know the winner, the WITHDRAW_REWARDS stage is triggered
+        assertEq(
+            uint256(instance.stage()),
+            uint256(RockPaperScisor.Stage.WITHDRAW_REWARDS)
+        );
     }
 }
