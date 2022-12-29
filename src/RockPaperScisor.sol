@@ -74,7 +74,7 @@ contract RockPaperScisor {
 
         // emit Deposited(payee, amount);
 
-        if (_players.length() == 2) stage = Stage.REVEAL;
+        if (_players.length() == 2) _netxStage();
     }
 
     function revealWinnerTwoPlayers(
@@ -104,7 +104,7 @@ contract RockPaperScisor {
         // add PullPayment logic
         _computeRewards();
 
-        stage = Stage.WITHDRAW_REWARDS;
+        _netxStage();
     }
 
     function commitOf(address player) public view returns (bytes32) {
@@ -140,6 +140,10 @@ contract RockPaperScisor {
             __resetDepositOnWinsOnly();
             _deposits[winner] = depositedETH;
         }
+    }
+
+    function _netxStage() internal {
+        stage = Stage(uint256(stage) + 1);
     }
 
     function _revealWinner(
