@@ -114,6 +114,10 @@ contract RockPaperScisorTest is Test {
         instance.revealWinnerTwoPlayers(revealAliceData, revealBobData);
 
         assertEq(instance.winner(), BOB);
+        // Bob wins everything that has been deposited
+        assertEq(instance.depositsOf(BOB), instance.depositedETH());
+        // Alice lost so she lost her be, resetting her deposits to 0
+        assertEq(instance.depositsOf(ALICE), 0);
 
         // once we know the winner, the WITHDRAW_REWARDS stage is triggered
         assertEq(
