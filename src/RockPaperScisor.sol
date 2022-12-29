@@ -52,13 +52,20 @@ contract RockPaperScisor {
     mapping(address => uint256) private _deposits;
     EnumerableSet.AddressSet private _players;
 
-    function commitOnlyTwoPlayers(bytes32 data, uint256 salt) public payable {
+    modifier requireStage(Stage _stage) {
+        require(_stage == stage, "Wrong stage");
+        _;
+    }
+
+    function commitOnlyTwoPlayers(
+        bytes32 data,
+        uint256 salt
+    ) public payable requireStage(Stage.COMMIT) {
         address player = msg.sender;
         uint256 amount = msg.value;
 
         require(amount == 5 ether, "Deposit 5 ether");
         require(_commits[player] == bytes32(""), "Already commited");
-        require(stage == Stage.COMMIT, "Two players already competing");
 
         _commits[player] = keccak256(abi.encodePacked(data, salt));
         _deposits[player] += amount;
@@ -73,7 +80,7 @@ contract RockPaperScisor {
     function revealWinnerTwoPlayers(
         RevealData memory player1Data,
         RevealData memory player2Data
-    ) public {
+    ) public requireStage(Stage.REVEAL) {
         bytes32 saltedHash1 = generateSaltedHashFrom(player1Data);
         bytes32 saltedHash2 = generateSaltedHashFrom(player2Data);
 
