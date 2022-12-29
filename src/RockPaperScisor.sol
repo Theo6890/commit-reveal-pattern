@@ -53,14 +53,6 @@ contract RockPaperScisor {
     mapping(address => uint256) private _deposits;
     EnumerableSet.AddressSet private _players;
 
-    function commitOf(address player) public view returns (bytes32) {
-        return _commits[player];
-    }
-
-    function depositsOf(address payee) public view returns (uint256) {
-        return _deposits[payee];
-    }
-
     function commitOnlyTwoPlayers(bytes32 data, uint256 salt) public payable {
         address player = msg.sender;
         uint256 amount = msg.value;
@@ -78,18 +70,6 @@ contract RockPaperScisor {
         // emit Deposited(payee, amount);
 
         if (playersCounter == 2) stage = Stage.REVEAL;
-    }
-
-    function generateSaltedHashFrom(
-        RevealData memory data
-    ) public pure returns (bytes32 salted) {
-        return
-            keccak256(
-                abi.encodePacked(
-                    keccak256(abi.encodePacked(data.player, data.action)),
-                    data.salt
-                )
-            );
     }
 
     function revealWinnerTwoPlayers(
@@ -120,6 +100,26 @@ contract RockPaperScisor {
         _computeRewards();
 
         stage = Stage.WITHDRAW_REWARDS;
+    }
+
+    function commitOf(address player) public view returns (bytes32) {
+        return _commits[player];
+    }
+
+    function depositsOf(address payee) public view returns (uint256) {
+        return _deposits[payee];
+    }
+
+    function generateSaltedHashFrom(
+        RevealData memory data
+    ) public pure returns (bytes32 salted) {
+        return
+            keccak256(
+                abi.encodePacked(
+                    keccak256(abi.encodePacked(data.player, data.action)),
+                    data.salt
+                )
+            );
     }
 
     function _computeRewards() internal {
