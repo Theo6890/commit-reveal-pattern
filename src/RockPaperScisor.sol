@@ -106,6 +106,6 @@ contract RockPaperScisor {
         else if ((a1 == Action.SCISOR) && (a2 == Action.PAPER))
             return BattleResult.WIN;
         // if it is not, an equality equality or a win, it is a loss
-        else BattleResult.LOSS;
+        else return BattleResult.LOSS;
     }
 }
