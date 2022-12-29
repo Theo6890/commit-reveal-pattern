@@ -30,6 +30,21 @@ contract RockPaperScisor {
     uint8 public playersCounter;
 
     uint256 public depositedETH;
+    address public winner;
+    /**
+     * @notice As a string character is 1 byte long. Casting a string of 8
+     *         characters to a byte20, to an address, will resut into a short
+     *         address: 4 left bytes set using hex values, 16 right bytes
+     *         padded with ZERO.
+     *
+     * Note: 1 bytes = 2 hex chars (excluding 0x)
+     *
+     * @dev We suppose such a short address will never be generated. Even if
+     *      it is generated this address will never be able to withdraw funds,
+     *      only the registered players will be able to withdraw.
+     */
+    address public constant EQUALITY_ADDR = address(bytes20("EQLT"));
+
     mapping(address => bytes32) public commitOf;
 
     function commitOnlyTwoPlayers(bytes32 data, uint256 salt) public payable {
@@ -78,14 +93,31 @@ contract RockPaperScisor {
             player2Data.action
         );
 
+        _revealWinner(resFirstPlayer, player1Data.player, player2Data.player);
+
         // add PullPayment logic
     }
 
-    function _isFirstActionWinning(Action a1, Action a2)
-        internal
-        pure
-        returns (BattleResult)
-    {
+    function _revealWinner(
+        BattleResult resFirstPlayer,
+        address player1,
+        address player2
+    ) internal {
+        /**
+         * @dev On equality, players get half of the rewards. With two players
+         *      only, it means they will get back there initial deposit.
+         */
+        // prettier-ignore
+        if (resFirstPlayer == BattleResult.EQUALITY) winner = EQUALITY_ADDR;
+        else if (resFirstPlayer == BattleResult.WIN) winner = player1;
+        // if not an equality or win for player1, it is a win for player2
+        else winner = player2;
+    }
+
+    function _isFirstActionWinning(
+        Action a1,
+        Action a2
+    ) internal pure returns (BattleResult) {
         // Equality
         if (a1 == a2) return BattleResult.EQUALITY;
         // paper
