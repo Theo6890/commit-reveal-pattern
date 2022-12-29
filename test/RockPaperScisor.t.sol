@@ -51,15 +51,11 @@ contract RockPaperScisorTest is Test {
     function __aliceCommitsChoiceWithDeposit() private {
         vm.prank(ALICE);
         instance.commitOnlyTwoPlayers{value: 5 ether}(aliceCommit, ALICE_SALT);
-
-        assert(instance.commitOf(ALICE) == aliceSaltedCommit);
     }
 
     function __bobCommitsChoiceWithDeposit() private {
         vm.prank(BOB);
         instance.commitOnlyTwoPlayers{value: 5 ether}(bobCommit, BOB_SALT);
-
-        assert(instance.commitOf(BOB) == bobSaltedCommit);
     }
 
     /*//////////////////////////////////////////////////////////////
