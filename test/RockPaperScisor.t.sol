@@ -65,6 +65,14 @@ contract RockPaperScisorTest is Test {
     /*//////////////////////////////////////////////////////////////
                                  BASIC ATTRIBUTES
     //////////////////////////////////////////////////////////////*/
+    function test_default_stageValue() public {
+        // default value is first value of the enum Stage
+        assertEq(
+            uint256(instance.stage()),
+            uint256(RockPaperScisor.Stage.COMMIT)
+        );
+    }
+
     function test_commitOnlyTwoPlayers_CheckSavedValuesOfAliceAndBobCommits()
         public
     {
