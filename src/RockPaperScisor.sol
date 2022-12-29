@@ -4,7 +4,13 @@ pragma solidity ^0.8.13;
 import {EnumerableSet} from "openzeppelin-contracts/utils/structs/EnumerableSet.sol";
 import {Address} from "openzeppelin-contracts/utils/Address.sol";
 
-// solhint-disable-next-line no-empty-blocks
+/**
+ * @author Theo6890
+ * @notice Famous Rock, Paper & Scisor on-chain implementation with
+ *         frontrunning protection using the commit-reveal pattern.
+ * @dev Pull over Push strategy implemented, see:
+ * https://github.com/fravoll/solidity-patterns/blob/master/docs/pull_over_push.md
+ */
 contract RockPaperScisor {
     using Address for address payable;
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -61,9 +67,16 @@ contract RockPaperScisor {
         _;
     }
 
+    /**
+     * @notice Function to play between two players
+     * @dev Data are hashed using abi.encodePacked, as there is only one
+     *      dynamic type (LOW) risk of collision , see SWC-133) & keccak256.
+     *      For more details see `RockPaperScisorTest.t.sol`.setUp() function.
+     *
+     * @param saltedData Hashed data of one of the two players.
+     */
     function commitOnlyTwoPlayers(
-        bytes32 data,
-        uint256 salt
+        bytes32 saltedData
     ) public payable requireStage(Stage.COMMIT) {
         address player = msg.sender;
         uint256 amount = msg.value;
@@ -71,7 +84,7 @@ contract RockPaperScisor {
         require(amount == 5 ether, "Deposit 5 ether");
         require(_commits[player] == bytes32(""), "Already commited");
 
-        _commits[player] = keccak256(abi.encodePacked(data, salt));
+        _commits[player] = saltedData;
         _deposits[player] += amount;
         depositedETH += amount;
         _players.add(player);
@@ -82,10 +95,20 @@ contract RockPaperScisor {
         if (_players.length() == 2) _netxStage();
     }
 
+    /**
+     * @notice Reveals the winner of the game. Must pass data commited plain
+     *         data and compare them with saved by hasing them.
+     *
+     * @param player1Data RevealData structure containing the player1 plain
+     *        data
+     * @param player2Data RevealData structure containing the player2 plain
+     *        data
+     */
     function revealWinnerTwoPlayers(
-        RevealData memory player1Data,
-        RevealData memory player2Data
+        RevealData calldata player1Data,
+        RevealData calldata player2Data
     ) public requireStage(Stage.REVEAL) {
+        // generate hashed data again to verify data authenticity
         bytes32 saltedHash1 = generateSaltedHashFrom(player1Data);
         bytes32 saltedHash2 = generateSaltedHashFrom(player2Data);
 
@@ -98,20 +121,27 @@ contract RockPaperScisor {
             "P2: data mismatch"
         );
 
-        // verify who is the winner
+        // verify which action wins
         BattleResult resFirstPlayer = _isFirstActionWinning(
             player1Data.action,
             player2Data.action
         );
 
+        // verify the winner and make it public
         _revealWinner(resFirstPlayer, player1Data.player, player2Data.player);
 
-        // add PullPayment logic
+        /**
+         * @dev PullPayment logic, to avoid DoS issues
+         */
         _computeRewards();
 
         _netxStage();
     }
 
+    /**
+     * @notice Winner or participants (in case of EQUALITY) will claim their
+     *         due. Pull over Push strategy.
+     */
     function withdrawRewards() public requireStage(Stage.WITHDRAW_REWARDS) {
         address payable payee = payable(msg.sender);
         uint256 payment = _deposits[payee];
@@ -147,8 +177,9 @@ contract RockPaperScisor {
         return _players.length();
     }
 
+    /// @dev Generate hashed for a given `RevealData` structure.
     function generateSaltedHashFrom(
-        RevealData memory data
+        RevealData calldata data
     ) public pure returns (bytes32 salted) {
         return
             keccak256(
@@ -159,12 +190,13 @@ contract RockPaperScisor {
             );
     }
 
+    /**
+     * @notice Rewards will be only computed if there is a winner. In the case
+     *         of equality each player takes their deposit back.
+     *         Otherwise if there is a winner they take it all
+     */
     function _computeRewards() internal {
-        // in case of equality each player takes their deposit back
-        // (handle by PullPayment)
-
-        // otherwise if there is a winner they take it all (verify winner is set)
-        // TEST: winner can never be == address(0) in any situation to remove condition
+        // TEST: verify winner is ALWAYS set => can never be address(0) in any situation to address(0) check
         if ((winner != address(0)) && (winner != EQUALITY_ADDR)) {
             __resetDepositsOnWinsOnly();
             _deposits[winner] = depositedETH;
@@ -175,15 +207,16 @@ contract RockPaperScisor {
         stage = Stage(uint256(stage) + 1);
     }
 
+    /**
+     * @notice Reveal if player 1 wins, losses or is equal with player 2.
+     * @dev On equality, players get half of the rewards. With two players
+     *      only, it means they will get back there initial deposit.
+     */
     function _revealWinner(
         BattleResult resFirstPlayer,
         address player1,
         address player2
     ) internal {
-        /**
-         * @dev On equality, players get half of the rewards. With two players
-         *      only, it means they will get back there initial deposit.
-         */
         // prettier-ignore
         if (resFirstPlayer == BattleResult.EQUALITY) winner = EQUALITY_ADDR;
         else if (resFirstPlayer == BattleResult.WIN) winner = player1;
@@ -191,6 +224,7 @@ contract RockPaperScisor {
         else winner = player2;
     }
 
+    ///@return BattleResult to know if `a1` wins over `a2` or not.
     function _isFirstActionWinning(
         Action a1,
         Action a2
@@ -216,12 +250,16 @@ contract RockPaperScisor {
         else return BattleResult.LOSS;
     }
 
-    ///@dev very sensitive functions, must only be used in this contract
+    /**
+     * @dev Very sensitive functions, must only be used in this contract,
+     *      enhance be private
+     */
 
+    ///@dev Reset all variables to default types values to play a new game.
     function __resetAllAfterAllWithdrawals() private {
         delete stage;
         delete depositedETH;
-
+        ///@dev hardcoded length, see SWC-128
         for (uint i; i < 2; ++i) {
             delete _commits[_players.at(i)];
         }
@@ -238,8 +276,9 @@ contract RockPaperScisor {
         delete _players;
     }
 
+    ///@dev Reset all saved deposits.
     function __resetDepositsOnWinsOnly() private {
-        // TODO: will assigning a local variable save gas, instead using `_players.length()`
+        ///@dev hardcoded length, see SWC-128
         for (uint i; i < 2; ++i) {
             _deposits[_players.at(i)] = 0;
         }

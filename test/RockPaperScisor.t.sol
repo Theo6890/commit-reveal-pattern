@@ -12,14 +12,18 @@ contract RockPaperScisorTest is Test {
     address public constant BOB = 0xDEe2C8F3345104f6DD081657D180A9058Be7Ab05;
 
     RockPaperScisor.Action public aliceAction = RockPaperScisor.Action.ROCK;
+    ///@dev encodePacked + kecccak256
     bytes32 public aliceCommit;
     uint256 public constant ALICE_SALT = 0x24502340F82A423A4;
+    ///@dev kecccak256 + salt
     bytes32 public aliceSaltedCommit;
     RockPaperScisor.RevealData public revealAliceData;
 
     RockPaperScisor.Action public bobAction = RockPaperScisor.Action.PAPER;
+    ///@dev encodePacked + kecccak256
     bytes32 public bobCommit;
     uint256 public constant BOB_SALT = 0x23548023FA30DC80B;
+    ///@dev kecccak256 + salt
     bytes32 public bobSaltedCommit;
     RockPaperScisor.RevealData public revealBobData;
 
@@ -50,12 +54,12 @@ contract RockPaperScisorTest is Test {
 
     function __aliceCommitsChoiceWithDeposit() private {
         vm.prank(ALICE);
-        instance.commitOnlyTwoPlayers{value: 5 ether}(aliceCommit, ALICE_SALT);
+        instance.commitOnlyTwoPlayers{value: 5 ether}(aliceSaltedCommit);
     }
 
     function __bobCommitsChoiceWithDeposit() private {
         vm.prank(BOB);
-        instance.commitOnlyTwoPlayers{value: 5 ether}(bobCommit, BOB_SALT);
+        instance.commitOnlyTwoPlayers{value: 5 ether}(bobSaltedCommit);
     }
 
     /*//////////////////////////////////////////////////////////////
