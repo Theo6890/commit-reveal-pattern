@@ -120,7 +120,10 @@ contract RockPaperScisor {
         //TODO: add event
         //emit Withdrawn(payee, payment);
 
-        __resetAllAfterAllWithdrawals();
+        // if ALL deposits have been withwrawn (on EQUALITY case == wait for both players withdrawals)
+        if (
+            (_deposits[_players.at(0)] == 0) && (_deposits[_players.at(1)] == 0)
+        ) __resetAllAfterAllWithdrawals();
     }
 
     function commitOf(address player) public view returns (bytes32) {
@@ -208,13 +211,15 @@ contract RockPaperScisor {
     function __resetAllAfterAllWithdrawals() private {
         delete stage;
         delete depositedETH;
-        delete winner;
 
         for (uint i; i < _players.length(); ++i) {
             delete _commits[_players.at(i)];
         }
 
-        ///@dev deposits have already been in `_computeRewards` for loser(s) and in `withdrawRewards` for winner
+        ///@dev If there is a single winner deposits reset have already been triggered (`_computeRewards` for loser(s), in `withdrawRewards` for winner)
+        if (winner == EQUALITY_ADDR) __resetDepositsOnWinsOnly();
+
+        delete winner;
 
         delete _players;
     }
