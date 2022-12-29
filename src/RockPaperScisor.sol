@@ -46,9 +46,15 @@ contract RockPaperScisor {
     address public constant EQUALITY_ADDR = address(bytes20("EQLT"));
 
     mapping(address => bytes32) private _commits;
+    mapping(address => uint256) private _deposits;
+    address[] public players; // to a EnumarableSet to use .contains()
 
     function commitOf(address player) public view returns (bytes32) {
         return _commits[player];
+    }
+
+    function depositsOf(address payee) public view returns (uint256) {
+        return _deposits[payee];
     }
 
     function commitOnlyTwoPlayers(bytes32 data, uint256 salt) public payable {
@@ -61,7 +67,11 @@ contract RockPaperScisor {
 
         ++playersCounter;
         _commits[player] = keccak256(abi.encodePacked(data, salt));
+        _deposits[player] += amount;
         depositedETH += amount;
+        players.push(player);
+
+        // emit Deposited(payee, amount);
 
         if (playersCounter == 2) stage = Stage.REVEAL;
     }
