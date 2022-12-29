@@ -55,9 +55,9 @@ contract RockPaperScisor {
         address player = msg.sender;
         uint256 amount = msg.value;
 
+        require(amount == 5 ether, "Deposit 5 ether");
         require(_commits[player] == bytes32(""), "Already commited");
         require(stage == Stage.COMMIT, "Two players already competing");
-        require(amount == 5 ether, "Deposit 5 ether");
 
         ++playersCounter;
         _commits[player] = keccak256(abi.encodePacked(data, salt));
