@@ -15,13 +15,13 @@ contract RockPaperScisorTest is Test {
     bytes32 public aliceCommit;
     uint256 public constant ALICE_SALT = 0x24502340F82A423A4;
     bytes32 public aliceSaltedCommit;
-    RockPaperScisor.RevealData revealAliceData;
+    RockPaperScisor.RevealData public revealAliceData;
 
     RockPaperScisor.Action public bobAction = RockPaperScisor.Action.PAPER;
     bytes32 public bobCommit;
     uint256 public constant BOB_SALT = 0x23548023FA30DC80B;
     bytes32 public bobSaltedCommit;
-    RockPaperScisor.RevealData revealBobData;
+    RockPaperScisor.RevealData public revealBobData;
 
     function setUp() public {
         instance = new RockPaperScisor();
@@ -42,6 +42,8 @@ contract RockPaperScisorTest is Test {
         bobCommit = keccak256(abi.encodePacked(BOB, bobAction));
         bobSaltedCommit = keccak256(abi.encodePacked(bobCommit, BOB_SALT));
         revealBobData = RockPaperScisor.RevealData(BOB, bobAction, BOB_SALT);
+
+        emit log_named_address("EQUALITY ADDRESS", instance.EQUALITY_ADDR());
     }
 
     function __aliceCommitsChoiceWithDeposit() private {
