@@ -138,4 +138,31 @@ contract RockPaperScisorTest is Test {
 
         assertEq(BOB.balance, oldBalance + 10 ether);
     }
+
+    function test_withdrawRewards_VerifyValuesReinitialisationAfterWinnerWithdrawal()
+        public
+    {
+        __aliceCommitsChoiceWithDeposit();
+        __bobCommitsChoiceWithDeposit();
+        instance.revealWinnerTwoPlayers(revealAliceData, revealBobData);
+
+        vm.prank(BOB); // winner
+        instance.withdrawRewards();
+
+        // ------ reset verification ------ //
+        assertEq(
+            uint256(instance.stage()),
+            uint256(RockPaperScisor.Stage.COMMIT)
+        );
+        assertEq(instance.depositedETH(), 0 ether);
+        assertTrue(instance.winner() == address(0));
+        // commits
+        assertTrue(instance.commitOf(ALICE) == bytes32(""));
+        assertTrue(instance.commitOf(BOB) == bytes32(""));
+        // deposits
+        assertEq(instance.depositsOf(BOB), 0);
+        assertEq(instance.depositsOf(ALICE), 0);
+        // registered players
+        assertTrue(instance.playersLength() == 0);
+    }
 }
