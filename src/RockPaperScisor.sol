@@ -125,9 +125,13 @@ contract RockPaperScisor {
         //TODO: add event
         //emit Withdrawn(payee, payment);
 
-        // if ALL deposits have been withwrawn (on EQUALITY case == wait for both players withdrawals)
+        /**
+         * @dev if ALL deposits have been withwrawn (on EQUALITY case == wait for
+         * both players withdrawals)
+         */
         if (
-            (_deposits[_players.at(0)] == 0) && (_deposits[_players.at(1)] == 0)
+            (_deposits[_players.at(0)] == 0) &&
+            (_deposits[_players.at(1)] == 0)
         ) __resetAllAfterAllWithdrawals();
     }
 
@@ -222,7 +226,11 @@ contract RockPaperScisor {
             delete _commits[_players.at(i)];
         }
 
-        ///@dev If there is a single winner deposits reset have already been triggered (`_computeRewards` for loser(s), in `withdrawRewards` for winner)
+        /**
+         * @dev If there is a single winner deposits reset have already been
+         *      triggered `_computeRewards` for loser(s), in `withdrawRewards`
+         *      for winner).
+         */
         if (winner == EQUALITY_ADDR) __resetDepositsOnWinsOnly();
 
         delete winner;
@@ -231,7 +239,7 @@ contract RockPaperScisor {
     }
 
     function __resetDepositsOnWinsOnly() private {
-        // TODO: will assigning a local variable save gas, instead using `_players.length()`?
+        // TODO: will assigning a local variable save gas, instead using `_players.length()`
         for (uint i; i < 2; ++i) {
             _deposits[_players.at(i)] = 0;
         }
