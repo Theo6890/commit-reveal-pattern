@@ -52,13 +52,16 @@ contract RockPaperScisor {
     }
 
     function commitOnlyTwoPlayers(bytes32 data, uint256 salt) public payable {
-        require(_commits[msg.sender] == bytes32(""), "Already commited");
+        address player = msg.sender;
+        uint256 amount = msg.value;
+
+        require(_commits[player] == bytes32(""), "Already commited");
         require(stage == Stage.COMMIT, "Two players already competing");
-        require(msg.value == 5 ether, "Deposit 5 ether");
+        require(amount == 5 ether, "Deposit 5 ether");
 
         ++playersCounter;
-        _commits[msg.sender] = keccak256(abi.encodePacked(data, salt));
-        depositedETH += msg.value;
+        _commits[player] = keccak256(abi.encodePacked(data, salt));
+        depositedETH += amount;
 
         if (playersCounter == 2) stage = Stage.REVEAL;
     }
