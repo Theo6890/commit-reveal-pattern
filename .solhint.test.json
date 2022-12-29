@@ -8,7 +8,7 @@
         "func-name-mixedcase": "off",
         "func-visibility": ["error", { "ignoreConstructors": true }],
         "state-visibility": "error",
-        "max-line-length": ["error", 120],
+        "max-line-length": ["off"],
         "not-rely-on-time": "off",
         "prettier/prettier": [
             "error",
